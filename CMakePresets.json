@@ -5,80 +5,62 @@
         "minor": 23,
         "patch": 0
     },
-    "configurePresets": [
-        {
-            "name": "config-base",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}"
+  "configurePresets": [
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "PATH",
+          "value": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
         },
-        {
-            "name": "msvc64-base",
-            "hidden": true,
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "cl",
-                "CMAKE_CXX_COMPILER": "cl",
-                "VCPKG_TARGET_TRIPLET": "x64-windows",
-                "VCPKG_HOST_TRIPLET": "x64-windows",
-                "VCPKG_BUILD_TYPE": "Debug"
-            }
+        "VCPKG_INSTALL_OPTIONS": {
+          "type": "STRING",
+          "value": "--disable-metrics;--x-abi-tools-use-exact-versions;--x-buildtrees-root=${sourceDir}/out/btrees;--debug"
         },
-        {
-            "name": "mingw64-base",
-            "hidden": true,
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++",
-                "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
-                "VCPKG_HOST_TRIPLET": "x64-windows",
-                "VCPKG_BUILD_TYPE": "Debug"
-            }
+        "VCPKG_INSTALLED_DIR": {
+          "type": "PATH",
+          "value": "${sourceDir}/out/vcpkg_installed"
         },
-        {
-            "name": "win64-base",
-            "hidden": true,
-            "inherits": [
-                "config-base"
-            ]
-        },
-        {
-            "name": "msvc-x64-debug-win",
-            "displayName": "MSVC x64 Debug Win",
-            "inherits": ["win64-base", "msvc64-base"],
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "mingw-x64-debug-win",
-            "displayName": "MinGW x64 Debug Win",
-            "inherits": ["win64-base", "mingw64-base"],
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
+        "VCPKG_OVERLAY_PORTS": {
+          "type": "PATH",
+          "value": "${sourceDir}/overlay-ports"
         }
-    ],
+      },
+      "environment": {
+        "CMAKE_VERBOSE_MAKEFILE": "ON"
+      }
+    },
+    {
+      "name": "config-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "${sourceDir}/3rdparty/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        }
+      }
+    },
+    {
+      "name": "win64-base",
+      "hidden": true,
+      "inherits": [
+        "config-base"
+      ]
+    },
+    {
+      "name": "mingw-x64-debug-win",
+      "displayName": "MinGW x64 Debug Win",
+      "inherits": [ "win64-base", "mingw64-base" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
     "buildPresets": [
-        {
-            "name": "Win x64 MSVC",
-            "configurePreset": "msvc-x64-debug-win",
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "Windows"
-                    ]
-                }
-            }
-        },
         {
             "name": "Win x64 MinGW",
             "configurePreset": "mingw-x64-debug-win",
